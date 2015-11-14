@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block style %}
+  <link href="{{url_for('static',filename='css/feed.css') }}"  rel="stylesheet"/>
+{% endblock %}
+{% block content %}
+
+  <h1> FEED PAGE </h1>
+  
+
+  <div class="row">
+    {% for e in entries %}
+      <div class="col-md-4 col_lg-3">
+        <h3><a href"{{ e.link }}">{{ e.title }}</a></h3>
+        <h5>published on: {{ e.published }}</h5>
+        {% for content in e.content %}
+          <p>{{ content.value|safe }}</p>
+        {% else %}
+          <p>{{ e.summary_detail.value|safe }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
