@@ -1,7 +1,8 @@
-from flask import Flask, render_template, redirect, url_for, request, g
+from flask import Flask, render_template, redirect, url_for, request, g, session
 import feedparser, sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'One day this might look more secret'
 db_location = 'var/rssreader.db'
 
 
@@ -36,17 +37,48 @@ def feed():
   feeds = []
   entries = []
   db.text_factory = str
-  sql = "SELECT feed FROM UserFeeds WHERE user ='Neverminder'"
+  try:
+    sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
+    if(len(db.cursor().execute(sql).fetchall())!=0):
+      for row in db.cursor().execute(sql):
+        feeds.append(str(row)[2:-3])
 
-  for row in db.cursor().execute(sql):
-    feeds.append(str(row)[2:-3])
+      for url in feeds:
+        entries.extend(feedparser.parse(url).entries)
 
-  for url in feeds:
-    entries.extend(feedparser.parse(url).entries)
+      entries_sorted = sorted(entries, key=lambda e: e.published_parsed, reverse=True)
 
-  entries_sorted = sorted(entries, key=lambda e: e.published_parsed, reverse=True)
+      return render_template('feed.html',entries=entries_sorted),200
+  except KeyError:
+    return render_template('feed.html'),200
 
-  return render_template('feed.html',entries=entries_sorted),200
+@app.route('/login/', methods=['GET','POST'])
+def login():
+  error = None
+  db = get_db()
+  if request.method == 'POST':
+    logUser = request.form['username']
+    logPass = request.form['password']
+    sql = "SELECT user FROM Users WHERE user ='"+logUser+"'"
+    if(len(db.cursor().execute(sql).fetchall()) == 0):
+       error = 'Username not found, Please try again'
+    else:
+      sql = "SELECT password FROM Users WHERE user ='"+logUser+"' AND password='"+logPass+"'"
+      if(len(db.cursor().execute(sql).fetchall()) ==0):
+        error = 'Password was incorrect, Please try again'
+      else:
+        session['logged_in']= True
+        session['User']= logUser
+        return redirect(url_for('root'))
+  return render_template('login.html',error=error)
+
+@app.route('/logout/')
+def logout():
+  session.clear()
+  return redirect(url_for('root'))
+
+
+
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', debug=True)
