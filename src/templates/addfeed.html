@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <form action="" method="post" class="form-group">
+    <h2 class="form-group-heading">Please enter RSS feed here</h2>
+    <input type="rss-address" id="rssAddress" class="form-control" name="rssAddress"
+      placeholder="http://example.com/rssfeed/" value="{{ request.form.rssAddress }}" required autofocus>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">submit</button>
+    {% if error %}
+      <p><strong>Error: </strong>{{ error }}</p>
+    {% endif %}
+  </form>
+{% endblock %}

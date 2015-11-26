@@ -31,26 +31,74 @@ def init_db():
 def root():
   return render_template('home.html'),200
 
+@app.route('/addfeed/', methods=['GET','POST'])
+def addfeed():
+  try:
+    error = None
+    db = get_db()
+    user = str(session['User'])
+    if  request.method == 'POST':
+      logFeed = request.form['rssAddress']
+      feed = feedparser.parse(logFeed)
+      print feed.bozo
+      if (feed.bozo == 1):
+        error = "The url was not a RSS feed. Please try again"
+      else:
+        sql = "INSERT INTO UserFeeds (user, feed) VALUES ('"+user+"', '"+logFeed+"')"
+        db.cursor().execute(sql)
+        db.commit()
+        return redirect(url_for('root'))
+    return render_template('addfeed.html', error=error),200
+  except KeyError:
+    return redirect(url_for('root'))
+
+@app.route('/rmfeed/', methods=['GET','POST'])
+def rmfeed():
+  db = get_db()
+  feeds =[]
+  user = str(session['User'])
+  try:
+    if request.method =='POST':
+      print "POST"
+      feed = request.form['rssAddress']
+      print feed
+      sql = "DELETE FROM UserFeeds WHERE user = '"+ user +"' AND feed = '"+ feed +"'"
+      print sql
+      db.cursor().execute(sql)
+      db.commit()
+      return redirect(url_for('root'))
+    else:
+      sql = "SELECT feed FROM UserFeeds WHERE user ='"+user+"'"
+      if(len(db.cursor().execute(sql).fetchall())!=0):
+        for row in db.cursor().execute(sql):
+          feeds.append(str(row)[3:-3])
+
+      return render_template('rmfeed.html',feeds=feeds)
+  except KeyError:
+    return redirect(url_for('root'))
+
+
 @app.route('/feed/')
 def feed():
-  db = get_db()
-  feeds = []
-  entries = []
-  db.text_factory = str
-  try:
-    sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
-    if(len(db.cursor().execute(sql).fetchall())!=0):
-      for row in db.cursor().execute(sql):
-        feeds.append(str(row)[2:-3])
+    db = get_db()
+    feeds = []
+    entries = []
+    db.text_factory = str
+    try:
+      sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
 
-      for url in feeds:
-        entries.extend(feedparser.parse(url).entries)
+      if(len(db.cursor().execute(sql).fetchall())!=0):
+        for row in db.cursor().execute(sql):
+          feeds.append(str(row)[2:-3])
+        for url in feeds:
+          entries.extend(feedparser.parse(url).entries)
+          print url
 
-      entries_sorted = sorted(entries, key=lambda e: e.published_parsed, reverse=True)
-
-      return render_template('feed.html',entries=entries_sorted),200
-  except KeyError:
-    return render_template('feed.html'),200
+        entries_sorted = sorted(entries, key=lambda e: e.published_parsed,
+        reverse=True)
+        return render_template('feed.html',entries=entries_sorted),200
+    except KeyError:
+      return render_template('feed.html'),200
 
 @app.route('/login/', methods=['GET','POST'])
 def login():
@@ -77,8 +125,19 @@ def logout():
   session.clear()
   return redirect(url_for('root'))
 
-
-
+@app.route('/signup/')
+def signup():
+  error = None
+  db = get_db()
+  if request.method =='POST':
+    signUser = request.form['username']
+    signPass = request.form['password']
+    sql = "SELECT user FROM Users WHERE user ='"+signUser+"'"
+    if(len(db.cursor().execute(sql).fetchall()) != 0):
+      error = 'Username already taken, try another name'
+    else:
+      print "IT WORKED"
+  return render_template('signup.html', error=error)
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', debug=True)

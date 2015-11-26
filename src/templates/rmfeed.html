@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Remove Feeds</h1>
+  <form class="form-horizontal" action="" method="post">
+    <div class="form-group">
+      {% for feed in feeds %}
+        <label class="col-md-8 control-label" name="{{ feed }}" for="singlebutton" value="{{ feed }}"">{{ feed }}</label>
+        <button name="rssAddress" id="singlebutton" class="btn btn-danger col-md-4" type="submit" value="{{ feed }}"" >Remove</button>
+      {% endfor %}
+    </div>
+  </form>
+{% endblock %}

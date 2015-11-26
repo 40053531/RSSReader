@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <form action="" method="post" class="form-signin">
+    <h2 class="form-signin-heading">Please enter you desired username and password</h2>
+    <input type="username" id="inputUsername" class="form-control" name="username"
+      placeholder="username" value="{{ request.form.username }}" required autofocus>
+    <input type="password" id="inputPassword" class="form-control" name="password"
+      placeholder="Password" value="{{ request.form.password }}" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    {% if error %}
+      <p class="error"><strong>Error: </strong>{{ error }}</p>
+    {% endif %}
+  </form>
+{% endblock %}

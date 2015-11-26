@@ -31,7 +31,13 @@
           </li>
           {% if session.logged_in %} 
             <li {% if request.path=="/feed/" %}class="active"{% endif %}>
-              <a href="{{ url_for('feed')}}">Feed</a>
+              <a href="{{ url_for('feed') }}">Feed</a>
+            </li>
+            <li {% if request.path=="/addfeed/" %}class="active"{% endif %}>
+              <a href="{{ url_for('addfeed') }}">Add Feed</a>
+            </li>
+            <li {% if request.path=="/rmfeed/" %}class="active"{% endif %}>
+              <a href="{{url_for('rmfeed') }}">Remove Feed</a>
             </li>
           {% endif %}
         </ul>
