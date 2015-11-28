@@ -29,7 +29,19 @@ def init_db():
 
 @app.route('/')
 def root():
-  return render_template('home.html'),200
+  db = get_db()
+  sql = "SELECT feed FROM UserFeeds ORDER by RANDOM() LIMIT 1"
+  db.text_factory = str
+  feedlist = []
+  for row in db.cursor().execute(sql):
+    url = str(row[0])
+  print url
+  rndfeed = feedparser.parse(url)
+  sql = "SELECT feed, COUNT(*) as count FROM UserFeeds GROUP BY feed ORDER BY count DESC LIMIT 5"
+  for row in db.cursor().execute(sql):
+    feedlist.append(str(row[0]))
+  print feedlist
+  return render_template('home.html',rndfeed=rndfeed,feedlist=feedlist),200
 
 @app.route('/addfeed/', methods=['GET','POST'])
 def addfeed():
@@ -119,6 +131,8 @@ def feed():
           return render_template('feed.html',entries=entries_sorted, style=style),200
       except KeyError:
         return render_template('feed.html'),200
+
+    return render_template('feed.html'),200
 
 @app.route('/login/', methods=['GET','POST'])
 def login():

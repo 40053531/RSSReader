@@ -1,5 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1> GOT TO START SOMEWHERE RIGHT </h1>
-  <img src="http://i.imgur.com/gCvcNo3.jpg"></img>
+  <h1>Welcome to the site</h1>
+  <div class="row">
+    <div class="col-md-6 col-lg-6" style="background:#EEE">
+      <div style="text-align: center">
+        <h2>Random Feed</h2>
+        <a href="{{ rndfeed.entries[2].link }}"><h3>{{ rndfeed.entries[2].title }}</h3></a>
+        <h5>Published: {{ rndfeed.entries[2].published }}</h5>
+      </div>
+      {% for content in rndfeed.entries[2].content %}
+        <div style="margin: 0 auto">{{ content.value|safe }}</div>
+      {% else %}
+        <div style="margin: 0 auto">{{ rndfeed.entries[2].summary_detail.value|safe }}</div>
+      {% endfor %}
+    </div>
+    <div class="col-md-6 col-lg-6" style="background:#EEE">
+      <div style="text-align: center">
+        <h2>Top Subcribed Feeds</h2>
+      </div>
+      <div>
+        <ul>
+          {% for feed in feedlist %}
+            <li><a href="{{ feed }}">{{ feed }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+  </div>
+      
 {% endblock %}
