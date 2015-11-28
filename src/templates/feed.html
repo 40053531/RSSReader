@@ -3,23 +3,46 @@
   <link href="{{url_for('static',filename='css/feed.css') }}"  rel="stylesheet"/>
 {% endblock %}
 {% block content %}
-
-  <h1> FEED PAGE </h1>
   
-
-  <div class="row">
-    {% for e in entries %}
-      <div class="col-md-4 col_lg-3">
-        <h3><a href"{{ e.link }}">{{ e.title }}</a></h3>
-        <h5>published on: {{ e.published }}</h5>
-        {% for content in e.content %}
-          <p>{{ content.value|safe }}</p>
-        {% else %}
-          <p>{{ e.summary_detail.value|safe }}</p>
-        {% endfor %}
+  <div>
+    <h1 style="float: left"> FEED PAGE </h1>
+    <form method="post">
+      <div class="btn-group" style="float: right">
+        <button name="btn" class="btn btn-lg glyphicon glyphicon-th {% if style %} active {% endif %}"
+          value="block" type="submit"></button>
+        <button name="btn" class="btn btn-lg glyphicon glyphicon-align-justify {% if not style %} active {% endif %}"
+          value="list" type="submit"></button>
       </div>
-    {% endfor %}
+    </form>
   </div>
+  <div style="clear: both">
+  </div>
+  {% if style %}
+    <div class="row">
+      {% for e in entries %}
+        <div class="col-md-4 col-lg-3">
+          <h3><a href="{{ e.link }}">{{ e.title }}</a></h3>
+          <h5>published on: {{ e.published }}</h5>
+          {% for content in e.content %}
+            <div>{{ content.value|safe }}</div>
+          {% else %}
+            <div>{{ e.summary_detail.value|safe }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="row">
+      {% for e in entries %}
+        <a href="{{ e.link }}">
+          <div class="col-md-12 col-lg-12">
+            <div style="display: inline-block"><h2>{{ e.title }}</h2></div>
+            <div style="display: inline-block"><p>at: {{ e.published }}</p></div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
 
 
 {% endblock %}

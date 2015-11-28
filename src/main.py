@@ -78,27 +78,47 @@ def rmfeed():
     return redirect(url_for('root'))
 
 
-@app.route('/feed/')
+@app.route('/feed/',methods=['GET','POST'])
 def feed():
     db = get_db()
     feeds = []
     entries = []
     db.text_factory = str
-    try:
-      sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
-
-      if(len(db.cursor().execute(sql).fetchall())!=0):
+    style = True
+    if (request.method == 'POST'):
+      if (request.form['btn'] == "block"):
+        style = True
+      else:
+        style = False
+      try:
+        sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
         for row in db.cursor().execute(sql):
           feeds.append(str(row)[2:-3])
         for url in feeds:
           entries.extend(feedparser.parse(url).entries)
           print url
 
-        entries_sorted = sorted(entries, key=lambda e: e.published_parsed,
-        reverse=True)
-        return render_template('feed.html',entries=entries_sorted),200
-    except KeyError:
-      return render_template('feed.html'),200
+        entries_sorted = sorted(entries, key=lambda e: e.published_parsed, reverse=True)
+        return render_template('feed.html',entries=entries_sorted, style=style),200
+      except:
+        return render_template('feed.html'),200
+
+    else:
+      try:
+        sql = "SELECT feed FROM UserFeeds WHERE user ='"+str(session['User'])+"'"
+
+        if(len(db.cursor().execute(sql).fetchall())!=0):
+          for row in db.cursor().execute(sql):
+            feeds.append(str(row)[2:-3])
+          for url in feeds:
+            entries.extend(feedparser.parse(url).entries)
+            print url
+
+          entries_sorted = sorted(entries, key=lambda e: e.published_parsed,
+          reverse=True)
+          return render_template('feed.html',entries=entries_sorted, style=style),200
+      except KeyError:
+        return render_template('feed.html'),200
 
 @app.route('/login/', methods=['GET','POST'])
 def login():
