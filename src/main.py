@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, g, session
-import feedparser, sqlite3
+import feedparser, sqlite3, bcrypt
 
 app = Flask(__name__)
-app.secret_key = 'One day this might look more secret'
+app.secret_key = "1\xa5b\xeb\x1c\xdc\xbf>n%CN\x8a\x14\xbe\x0b\xc8ek\xf6:\cbd'O"
 db_location = 'var/rssreader.db'
 
 
@@ -104,6 +104,7 @@ def feed():
 def login():
   error = None
   db = get_db()
+  dbpass = None
   if request.method == 'POST':
     logUser = request.form['username']
     logPass = request.form['password']
@@ -111,8 +112,10 @@ def login():
     if(len(db.cursor().execute(sql).fetchall()) == 0):
        error = 'Username not found, Please try again'
     else:
-      sql = "SELECT password FROM Users WHERE user ='"+logUser+"' AND password='"+logPass+"'"
-      if(len(db.cursor().execute(sql).fetchall()) ==0):
+      sql = "SELECT password FROM Users WHERE user ='"+logUser+"'"
+      for row in db.cursor().execute(sql):
+        dbPass = str(row)[3:-3]
+      if (dbPass != bcrypt.hashpw(logPass.encode('utf-8'),dbPass)):
         error = 'Password was incorrect, Please try again'
       else:
         session['logged_in']= True
@@ -125,18 +128,21 @@ def logout():
   session.clear()
   return redirect(url_for('root'))
 
-@app.route('/signup/')
+@app.route('/signup/', methods=['GET','POST'])
 def signup():
   error = None
   db = get_db()
   if request.method =='POST':
     signUser = request.form['username']
-    signPass = request.form['password']
     sql = "SELECT user FROM Users WHERE user ='"+signUser+"'"
     if(len(db.cursor().execute(sql).fetchall()) != 0):
       error = 'Username already taken, try another name'
     else:
-      print "IT WORKED"
+      pwhash = bcrypt.hashpw(request.form['password'], bcrypt.gensalt())
+      sql = "INSERT INTO Users(user,password) VALUES ('"+signUser+"', '"+pwhash+"')"
+      db.cursor().execute(sql)
+      db.commit()
+      return redirect(url_for('root'))
   return render_template('signup.html', error=error)
 
 if __name__ == "__main__":

@@ -46,6 +46,9 @@
             <li {% if request.path==("/login/") %} class="active" {% endif %}>
               <a href="{{ url_for('login') }}">Log In</a>
             </li>
+            <li {% if request.path==("/signup/") %} class="active" {% endif %}>
+              <a href="{{ url_for('signup') }}">Sign up</a>
+            </li>
           {% else %}
             <li>
               <a href="{{ url_for('logout') }}">Log Out</a>
