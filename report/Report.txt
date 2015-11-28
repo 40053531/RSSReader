@@ -1,0 +1,93 @@
+Intro
+The app I have desided to create is a web app that lets multiple user create
+accounts to subscribe to RSS Feeds and view the feeds in multiple styles.
+
+Design
+The app follow a fairly simple URL hierachy where the pages were on their own
+top level link such as /feed/, /addfeed/ and /login/. 
+
+home page (aka root)
+This page has two halves where one shows off a random feed page from one of the
+feeds in the database. and the other shows the top 5 feeds based on their
+number of apperances in the UserFeeds table of the database
+
+feeds page (aka /feeds/)
+This page displays all of the entries for the feeds that they have added to
+their account ordered by the date and time that they were published on their
+respective feeds. On top of this the there is an option on the top of the page
+that will change the layout of the page to a simpler set-up where the contents
+of the entries are omitted but likes to their respective pages are preserved
+
+add feed (aka /addfeed/)
+This page allows the user to add a new RSS feed to their account. On this page
+the text added is tested to see if it actually a RSS Feed so that other pages
+don't get bogus entries that could break the system.
+
+remove Feeds (aka /rmfeed/)
+This page displays all feeds that the use is currently subscribed to and allows
+the user to, at the clock of a button, remove a feed from their account
+
+Login (aka /login/)
+This page is a simple login page that test the users credentials against the
+database. and if they are correct, will start a session that will allow access
+to the add and remove feeds pages.
+
+Logout (aka /logout/)
+This page doesn't have a render as when you go to this page it will remove the
+session that states that you are logged in.
+
+Sign up (aka /signup/)
+This page is a simple signup page that allows the user to create a new account
+as iff it were their 1st time on the web-app. The page also checks that the
+user is not creating a new account with a username that is already in use,
+stoping any confusions that could come of it
+
+There is also a 404 page that will redirect the user to the home page if they
+want
+
+Enchancements
+One of the main things I would like to improve the loading the pages that
+include the Feeds. I believe that this could be done by saving a copy of the
+Feed to a static file that can be checked to see if it is up to date. This
+would save on loading it from the individual sites as well as protect against
+if the feed site was down and make the feed unavailable
+Other things i would like to do toward the site would include adding better
+layouts to the feeds page, combinding the add and remove feeds to a single
+page (a subsciption management page) and a base feeds page that takes off the
+top feeds as to allow new users to see the feeds page without logging in.
+the feeds page could also use some form of pagination to make the page easier
+to read.
+
+Critical Evaluation
+One of the biggest problems I see with the web app at the current state, any
+page that includes multiple feeds tends to take a while to load the page. more
+feeds required, usually longer load times. The Feeds page where it is the block
+layout has a tendency to have a interesting finishing layout, though I do like
+the idea behind the layout, it needs more css to complete the layout.
+Besides this, the site well manages to accept many user feeds and present them
+to the user. On top of this the page also handles multiple users well as well
+as having no user logged in.
+
+Personal Evaluation
+On of the biggest challenges I faced when creating the web-app was finding a
+way to parse and display the RSS feeds. The best way i found to do this is
+using the open source library name "feedparser". After learning the in's and
+out's of this library, I was able to make good use of it to enable viewing the
+feeds on the feeds page as well as checking the validaty of a url on the add
+feeds page. On top of this i was able to further my knowledge of SQLite3 and
+learn about password hashing via py_bcrypt which both play their part in the
+creation of the Databases used in the app as well as keeping the users
+passwords safe.
+
+Resources
+py-bcrypt
+https://pypi.python.org/pypi/py-bcrypt/
+SQLite3
+https://www.SQLite.org/download.html
+Feedparser
+https://pypi.python.org/pypi/feedparser/
+
+References
+https://pythonhosted.org/feedparser/
+https://www.w3schools.org/
+Advanced Web Technologies Workbook on Moodle
